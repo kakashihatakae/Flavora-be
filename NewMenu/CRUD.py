@@ -41,17 +41,6 @@ async def add_items_new_menu(item_ids: List[int], menu_id: str, db: Session):
 
 
 async def add_new_item(NewItem: NewItem, item_owner_id: int, db: Session):
-    # TODO
-    #     db.query(Menus.Menus)
-    # .filter_by(menu_owner_id=menu_owner_id)
-    # .options(
-    #     load_only(
-    #         Menus.Menus.order_deadline,
-    #         Menus.Menus.delivery_estimate,
-    #         Menus.Menus.menu_id,
-    #         Menus.Menus.title,
-    #     )
-    # )
     new_item = Items.Items(
         image=NewItem.image,
         price=NewItem.price,
@@ -65,21 +54,16 @@ async def add_new_item(NewItem: NewItem, item_owner_id: int, db: Session):
 
 
 async def get_all_items(item_owner_id: str, db: Session):
-    items = (
-        db.query(
-            Items.Items.image, Items.Items.item_id, Items.Items.name, Items.Items.price
-        )
+    return (
+        db.query(Items.Items)
         .filter(Items.Items.item_owner_id == item_owner_id)
+        .options(
+            load_only(
+                Items.Items.image,
+                Items.Items.item_id,
+                Items.Items.name,
+                Items.Items.price,
+            )
+        )
         .all()
     )
-    # TODO: change
-    items_list = [
-        {
-            "image": item.image,
-            "item_id": item.item_id,
-            "name": item.name,
-            "price": item.price,
-        }
-        for item in items
-    ]
-    return items_list

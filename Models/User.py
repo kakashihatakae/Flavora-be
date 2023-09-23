@@ -8,7 +8,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     role = Column(String(10), nullable=False)
     name = Column(String(100))
-    email = Column(String(20), unique=True, nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
 
     # items ordered by a user

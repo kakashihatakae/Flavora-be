@@ -44,7 +44,6 @@ async def authenticate_request(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         if "email" not in payload:
@@ -52,17 +51,13 @@ async def authenticate_request(
 
         email: str = payload["email"]
         expiration: int = payload["expiry"]
+        role: str = payload["role"]
         if time.mktime(datetime.utcnow().timetuple()) > expiration:
             raise credentials_exception
 
     except JWTError:
         raise credentials_exception
-
-    user = CRUD.get_user_by_email(email=email, db=db)
-    print(user.email)
-    # TODO: Add validation for roles !
-    # make one of the platforms send an extra param
-    # to see if they are movile or web
+    user = CRUD.get_user_by_email(email=email, role=role, db=db)
 
     if not user:
         raise credentials_exception
@@ -79,7 +74,6 @@ async def authenticate_request(
 async def register(user: UserSchema, db: Session = Depends(get_db)):
     hashed_password = get_hashed_password(user.password)
     user_hashed = User(email=user.email, password=hashed_password, role=user.role)
-
     try:
         CRUD.create_user(user=user_hashed, db=db)
     except SQLAlchemyError as e:
@@ -90,7 +84,7 @@ async def register(user: UserSchema, db: Session = Depends(get_db)):
     tokenExpiry = accessTokenExpiry + datetime.utcnow()
     tokenExpiryUnixTime = time.mktime(tokenExpiry.timetuple())
     accessToken = create_access_token(
-        data={"email": user.email, "expiry": tokenExpiryUnixTime},
+        data={"email": user.email, "expiry": tokenExpiryUnixTime, "role": user.role},
         SECRET_KEY=SECRET_KEY,
         ALGORITHM=ALGORITHM,
         expires_delta=accessTokenExpiry,
@@ -106,7 +100,6 @@ async def login(user: UserSchema, db: Session = Depends(get_db)):
     except SQLAlchemyError as e:
         # TODO: change status code
         raise HTTPException(status_code=404, detail="Singin DB error")
-
     if not current_user:
         raise HTTPException(status_code=404, detail="Please check username")
 
@@ -117,7 +110,7 @@ async def login(user: UserSchema, db: Session = Depends(get_db)):
     tokenExpiry = accessTokenExpiry + datetime.utcnow()
     tokenExpiryUnixTime = time.mktime(tokenExpiry.timetuple())
     accessToken = create_access_token(
-        data={"email": user.email, "expiry": tokenExpiryUnixTime},
+        data={"email": user.email, "expiry": tokenExpiryUnixTime, "role": user.role},
         SECRET_KEY=SECRET_KEY,
         ALGORITHM=ALGORITHM,
         expires_delta=accessTokenExpiry,
