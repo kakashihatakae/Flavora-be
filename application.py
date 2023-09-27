@@ -3,11 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
 from Models import User, Orders, Items, Menus
 from NewMenu import NewMenuController
+from Auth import AuthController
 
 
 # from Email.EmailController import EmailRouter
 
 app = FastAPI()
+app.include_router(router=AuthController.AuthRouter)
 app.include_router(router=NewMenuController.NewMenuRouter)
 
 

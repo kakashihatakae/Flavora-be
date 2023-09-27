@@ -6,10 +6,10 @@ from sqlalchemy.orm import relationship
 class User(Base):
     __tablename__ = "User"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    role = Column(String(10))
+    role = Column(String(10), nullable=False)
     name = Column(String(100))
-    email = Column(String(20), unique=True)
-    password = Column(String(50))
+    email = Column(String(100), unique=True, nullable=False)
+    password = Column(String(100), nullable=False)
 
     # items ordered by a user
     orders = relationship("Orders", backref="User")
