@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 
 
@@ -10,6 +10,15 @@ class User(Base):
     name = Column(String(100))
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
+    image = Column(String(200))
+    addressLine1 = Column(String(100))
+    addressLine2 = Column(String(100))
+    city = Column(String(50))
+    state = Column(String(50))
+    zipCode = Column(String(20))
+    country = Column(String(50))
+    delivery = Column(Boolean, default=False)
+    pickup = Column(Boolean, default=False)
 
     # items ordered by a user
     orders = relationship("Orders", backref="User")

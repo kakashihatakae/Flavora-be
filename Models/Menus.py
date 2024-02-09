@@ -9,8 +9,8 @@ class Menus(Base):
     menu_id = Column(Integer, primary_key=True, autoincrement=True)
     menu_owner_id = Column(Integer, ForeignKey("User.id"))
     title = Column(String(50), nullable=False)
-    order_deadline = Column(DateTime, nullable=False)
-    delivery_estimate = Column(DateTime, nullable=False)
+    order_deadline = Column(Integer, nullable=False)
+    delivery_estimate = Column(Integer, nullable=False)
 
     # orders from users that have this menu
     orders = relationship("Orders", backref="Menus")

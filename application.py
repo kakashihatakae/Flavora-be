@@ -2,15 +2,19 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
 from Models import User, Orders, Items, Menus
-from NewMenu import NewMenuController
+from Menu import MenuController
 from Auth import AuthController
+from Order import OrderControler
+from Profile import ProfileController
 
 
 # from Email.EmailController import EmailRouter
 
 app = FastAPI()
 app.include_router(router=AuthController.AuthRouter)
-app.include_router(router=NewMenuController.NewMenuRouter)
+app.include_router(router=MenuController.NewMenuRouter)
+app.include_router(router=OrderControler.OrderRouter)
+app.include_router(router=ProfileController.ProfileRouter)
 
 
 # change this to allow access frontent

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 
-from Auth.AuthSchemas import UserSchema
+from Auth.AuthSchemas import UserSchema, ConsumerAccountInfo
 from Auth.utils import create_access_token, verify_password, get_hashed_password
 from Auth import CRUD
 from Models.User import User
@@ -64,12 +64,6 @@ async def authenticate_request(
     return user
 
 
-# @AuthRouter.get("/init_trip")
-# async def basic(k: Annotated[str, Depends(authenticate_request)]):
-#     print(k)
-#     return ""
-
-
 @AuthRouter.post("/register")
 async def register(user: UserSchema, db: Session = Depends(get_db)):
     hashed_password = get_hashed_password(user.password)
@@ -121,3 +115,34 @@ async def login(user: UserSchema, db: Session = Depends(get_db)):
         "expiry": int(tokenExpiryUnixTime),
         "message": "success",
     }
+
+
+@AuthRouter.post("/mobile/manage_account")
+async def manageConsumerInfo(
+    account_info: ConsumerAccountInfo,
+    user: Annotated[User, Depends(authenticate_request)],
+    db: Session = Depends(get_db),
+):
+    try:
+        await CRUD.add_consumer_address_name(
+            user=user, db=db, account_info=account_info
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update address and name. url: mobile/manage_account, Error: {e}",
+        )
+
+
+@AuthRouter.get("/mobile/manage_account")
+async def manageConsumerInfo(
+    user: Annotated[User, Depends(authenticate_request)],
+    db: Session = Depends(get_db),
+):
+    try:
+        return await CRUD.get_consumer_address_name(user_id=user.id, db=db)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get address and name. url: mobile/manage_account, Error: {e}",
+        )

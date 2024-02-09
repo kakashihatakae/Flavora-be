@@ -1,16 +1,15 @@
 from typing import List
-from datetime import datetime
 from pydantic import BaseModel, PositiveFloat
 
 
-class NewItem(BaseModel):
+class ItemSchema(BaseModel):
     price: PositiveFloat
     name: str
     image: str  # change
 
 
-class NewMenu(BaseModel):
-    order_deadline: datetime
-    delivery_estimate: datetime
+class MenuSchema(BaseModel):
+    order_deadline: int
+    delivery_estimate: int
     item_ids: List[int]
     title: str
